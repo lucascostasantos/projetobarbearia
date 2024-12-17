@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { inserirCliente } from "./produtoModel.js";
+import ClienteController from "./ClienteController.js";
 
 const router = Router();
 
@@ -11,18 +11,14 @@ router.get("/telainicial/agendamento", (req, res) => {
     res.sendFile("agendamento.html", { root: process.cwd() });
 });
 
-router.post("/", (req, res)=>{
-    const { nomeCompleto, email, telefone, senha } = req.body;
+router.get('/usuarios', ClienteController.index);
 
-    inserirCliente(nomeCompleto, email, telefone, senha, (erro, resultado) => {
-        if (erro) {
-            console.error(erro);
-            return res.status(500).send('Erro ao inserir cliente.');
-        }
-        console.log(resultado);
-        res.send('Cliente inserido com sucesso!');
-        res.end();
-    });
-});
+router.get('/usuarios/:id/', ClienteController.show);
+
+router.post('/usuarios', ClienteController.store);
+
+router.put('/usuarios/:id', ClienteController.update);
+
+router.delete('/usuarios/:id', ClienteController.destroy);
 
 export default router;
