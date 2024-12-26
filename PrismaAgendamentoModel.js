@@ -2,33 +2,24 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient()
 
-class ClienteModel {
+class AgendamentoModel {
 
   async find() {
-    const clientes = await prisma.clientes.findMany();
-    return clientes;
+    const agendamento = await prisma.agendamento.findMany();
+    return agendamento;
   }
 
   async findById(id) {
-    const cliente = prisma.clientes.findUnique({
+    const agendamento = prisma.agendamento.findUnique({
       where: {
         id: Number(id)
       }
     })
-    return cliente;
+    return agendamento;
   }
 
-  async findByEmail(email) {
-    const cliente = prisma.clientes.findUnique({
-      where: {
-        email: email
-      }
-    })
-    return cliente;
-  }
-
-  async create(cliente) {
-    const clientes = await prisma.clientes.create({
+  async create(agendamento) {
+    const agendamento = await prisma.agendamento.create({
       data: {
         nome: cliente.nome,
         email: cliente.email,
@@ -40,7 +31,7 @@ class ClienteModel {
   }
 
   async update(cliente) {
-    const clientes = await prisma.clientes.update({
+    const clientes = await prisma.cliente.update({
       where: {
         id: Number(cliente.id)
       },

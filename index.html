@@ -63,7 +63,7 @@
             cursor: pointer;
             font-weight: bold;
             padding: 10px;
-            color: white; /* Cor padrão */
+            color: white; 
             background-color: transparent;
         }
 
@@ -90,27 +90,39 @@
             <h1 style="display: inline;">LMBARBEARIA</h1>
         </div>
         <div>
-            <p id="loginText" onclick="showLogin()" class="toggle-link active">LOGIN</p>
-            <p id="registerText" onclick="showRegister()" class="toggle-link">CADASTRAR</p>
+            <p id="aba-login" onclick="showLogin()" class="toggle-link active">LOGIN</p>
+            <p id="aba-cadastrar" onclick="showRegister()" class="toggle-link">CADASTRAR</p>
         </div>
-        <form style="width: 70%;" id="formulariologin" class="active" action="/telainicial" method="get">
-            <input style="margin-bottom: 25px;" type="email" class="form-control" placeholder="EMAIL">
-            <input style="margin-bottom: 30px;" type="password" class="form-control"  placeholder="SENHA">
-            <button type="submit" class="btn btn" style="width: 320px; background-color: rgb(255, 94, 0); color: white; border-radius: 80px; height: 45px; font-weight: bold;">LOGIN</button>
+        <form style="width: 70%;" id="formulariologin" class="active" action="/login" method="post">
+            <input style="margin-bottom: 25px;" type="email" name="email" class="form-control" placeholder="EMAIL">
+            <input style="margin-bottom: 30px;" type="password" name="senha" class="form-control"  placeholder="SENHA">
+            <button type="submit" id="btn-login" class="btn btn" style="width: 320px; background-color: rgb(255, 94, 0); color: white; border-radius: 80px; height: 45px; font-weight: bold;">LOGIN</button>
         </form>
-        <form style="width: 70%;" id="formulariocadastro" action="http://localhost:3000/usuarios" method="post">
-            <input style="margin-bottom: 25px;" type="text" class="form-control"  name="nome" placeholder="NOME">
-            <input style="margin-bottom: 30px;" type="email" class="form-control"  name="email" placeholder="EMAIL">
-            <input style="margin-bottom: 30px;" type="tel" class="form-control"  name="telefone" placeholder="TELEFONE">
-            <input style="margin-bottom: 30px;" type="password" class="form-control"  name="password" placeholder="SENHA">
-            <button type="submit" class="btn btn" style="width: 320px; background-color: rgb(255, 94, 0); color: white; border-radius: 80px; height: 45px; font-weight: bold;">CADASTRAR</button>
+        <form style="width: 70%;" id="formulariocadastro" method="post">
+            <input style="margin-bottom: 25px;" type="text" class="form-control" id="nome"  name="nome" placeholder="NOME">
+            <input style="margin-bottom: 30px;" type="email" class="form-control" id="email" name="email" placeholder="EMAIL">
+            <input style="margin-bottom: 30px;" type="tel" class="form-control" id="telefone" name="telefone" placeholder="TELEFONE" pattern="[0-9]{10,11}">
+            <input style="margin-bottom: 30px;" type="password" class="form-control" id="senha"  name="senha" placeholder="SENHA">
+            <button type="submit" id="btn-cadastrar" class="btn btn" style="width: 320px; background-color: rgb(255, 94, 0); color: white; border-radius: 80px; height: 45px; font-weight: bold;">CADASTRAR</button>
         </form>
     </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Cadastro realizado com sucesso!
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
     
 
     <script>
         function showLogin() {
-            // Ativar o formulário de login e desativar o de cadastro
+
             document.getElementById('formulariologin').classList.add('active');
             document.getElementById('formulariocadastro').classList.remove('active');
 
@@ -118,13 +130,12 @@
             formContainer.classList.add('small');
             formContainer.classList.remove('large');
 
-            // Alterar as cores do texto
-            document.getElementById('loginText').classList.add('active');
-            document.getElementById('registerText').classList.remove('active');
+            document.getElementById('aba-login').classList.add('active');
+            document.getElementById('aba-cadastrar').classList.remove('active');
         }
 
         function showRegister() {
-            // Ativar o formulário de cadastro e desativar o de login
+
             document.getElementById('formulariocadastro').classList.add('active');
             document.getElementById('formulariologin').classList.remove('active');
 
@@ -132,10 +143,57 @@
             formContainer.classList.add('large');
             formContainer.classList.remove('small');
 
-            // Alterar as cores do texto
-            document.getElementById('registerText').classList.add('active');
-            document.getElementById('loginText').classList.remove('active');
+            document.getElementById('aba-cadastrar').classList.add('active');
+            document.getElementById('aba-login').classList.remove('active');
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.querySelector('#formulariocadastro'); 
+            const abaLogin = document.querySelector('#aba-login');
+
+            const successToast = new bootstrap.Toast(document.getElementById('successToast'));
+
+            let cadastroConcluido = false; 
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault(); 
+
+                const nome = document.querySelector('#nome').value;
+                const email = document.querySelector('#email').value;
+                const telefone = document.querySelector('#telefone').value;
+                const senha = document.querySelector('#senha').value;
+
+                try {
+                
+                    const response = await fetch('http://localhost:3000/usuarios', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ nome, email, telefone, senha }),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        cadastroConcluido = true; 
+                        abaLogin.click();      
+                    } else {
+                        alert(data.message); 
+                    }
+                } catch (error) {
+                    console.error('Erro:', error);
+                    alert('Erro no servidor. Tente novamente!');
+                }
+            });
+
+            abaLogin.addEventListener('click', () => {
+                if (cadastroConcluido) {
+                    successToast.show();
+                    cadastroConcluido = false;
+                }
+            });
+        });
 
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>

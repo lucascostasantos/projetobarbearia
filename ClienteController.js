@@ -13,8 +13,8 @@ class ClienteController {
     const nome = req.body.nome;
     const email = req.body.email;
     const telefone = req.body.telefone;
-    const password = req.body.password;
-    const cliente = await ClienteModel.create({ nome, email, telefone, password });
+    const senha = req.body.senha;
+    const cliente = await ClienteModel.create({ nome, email, telefone, senha });
     res.json(cliente);
 
   }
@@ -29,8 +29,8 @@ class ClienteController {
     const nome = req.body.nome;
     const email = req.body.email;
     const telefone = req.body.telefone;
-    const password = req.body.password;
-    const cliente = await ClienteModel.update({ nome, email, telefone, password });
+    const senha = req.body.senha;
+    const cliente = await ClienteModel.update({ nome, email, telefone, senha });
     res.json(cliente);
   }
 

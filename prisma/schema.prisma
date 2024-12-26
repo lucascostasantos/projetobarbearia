@@ -13,10 +13,43 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+
 model Clientes {
-  id       Int    @id @default(autoincrement())
-  nome String 
-  email String @unique
-  telefone String
-  password String @unique
+  id          Int         @id @default(autoincrement())
+  nome        String
+  email       String      @unique
+  senha       String
+  telefone    String?
+  agendamentos Agendamento[]
+}
+
+model Servicos {
+  id          Int         @id @default(autoincrement())
+  nome        String
+  descricao   String?
+  preco       Float
+  agendamentos Agendamento[]
+}
+
+model Agendamento {
+  id            Int         @id @default(autoincrement())
+  clienteId     Int
+  servicoId     Int
+  horarioId     Int
+  status        String      @default("agendado")
+  criadoEm      DateTime    @default(now())
+  atualizadoEm  DateTime    @updatedAt
+
+  // Relacionamentos
+  cliente       Clientes     @relation(fields: [clienteId], references: [id])
+  servico       Servicos     @relation(fields: [servicoId], references: [id])
+  horario       HorarioDisponivel @relation(fields: [horarioId], references: [id])
+}
+
+// Tabela de Horários Disponíveis
+model HorarioDisponivel {
+  id            Int         @id @default(autoincrement())
+  dataHora      DateTime    @unique
+  disponivel    Boolean     @default(true)
+  agendamentos  Agendamento[]
 }

@@ -96,6 +96,12 @@
       background-color: rgb(255, 94, 0); /* Cor de fundo ao selecionar o card */
     }
 
+    .custom-card {
+    width: 20rem;
+    flex-shrink: 0;
+  }
+
+
   </style>
 </head>
 <body>
@@ -125,83 +131,8 @@
   </div>
 
 
-  <div style="display: flex; gap: 10px; color: black; overflow-x: scroll; scroll-snap-type: x mandatory; padding: 10px; border: 1px solid #ccc; margin-bottom: 30px; margin-left: 100px; margin-right: 100px;">
-    <div class="card" style="width: 15rem; flex: 0 0 auto; scroll-snap-align: start;" onclick="selectCard(this)">
-      <img src="https://i.pinimg.com/564x/44/60/69/4460690b314783fe1f0138027a871a0f.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-    </div>
+  <div id="cards-container" style="display: flex; gap: 10px; color: black; overflow-x: scroll; scroll-snap-type: x mandatory; padding: 10px; border: 1px solid #ccc; margin-bottom: 30px; margin-left: 100px; margin-right: 100px;">
   
-    <div class="card" style="width: 15rem; flex: 0 0 auto; scroll-snap-align: start;" onclick="selectCard(this)">
-      <img src="https://i.pinimg.com/564x/44/60/69/4460690b314783fe1f0138027a871a0f.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-    </div>
-  
-    <div class="card" style="width: 15rem; flex: 0 0 auto; scroll-snap-align: start;" onclick="selectCard(this)">
-      <img src="https://i.pinimg.com/564x/44/60/69/4460690b314783fe1f0138027a871a0f.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-    </div>
-  
-    <div class="card" style="width: 15rem; flex: 0 0 auto; scroll-snap-align: start;" onclick="selectCard(this)">
-      <img src="https://i.pinimg.com/564x/44/60/69/4460690b314783fe1f0138027a871a0f.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-    </div>
-  
-    <div class="card" style="width: 15rem; flex: 0 0 auto; scroll-snap-align: start;" onclick="selectCard(this)">
-      <img src="https://i.pinimg.com/564x/44/60/69/4460690b314783fe1f0138027a871a0f.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-    </div>
-
-    <div class="card" style="width: 15rem; flex: 0 0 auto; scroll-snap-align: start;" onclick="selectCard(this)">
-      <img src="https://i.pinimg.com/564x/44/60/69/4460690b314783fe1f0138027a871a0f.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-    </div>
-
-    <div class="card" style="width: 15rem; flex: 0 0 auto; scroll-snap-align: start;" onclick="selectCard(this)">
-      <img src="https://i.pinimg.com/564x/44/60/69/4460690b314783fe1f0138027a871a0f.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-    </div>
-
-    <div class="card" style="width: 15rem; flex: 0 0 auto; scroll-snap-align: start;" onclick="selectCard(this)">
-      <img src="https://i.pinimg.com/564x/44/60/69/4460690b314783fe1f0138027a871a0f.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-    </div>
-
-    <div class="card" style="width: 15rem; flex: 0 0 auto; scroll-snap-align: start;" onclick="selectCard(this)">
-      <img src="https://i.pinimg.com/564x/44/60/69/4460690b314783fe1f0138027a871a0f.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-    </div>
-
-    <div class="card" style="width: 15rem; flex: 0 0 auto; scroll-snap-align: start;" onclick="selectCard(this)">
-      <img src="https://i.pinimg.com/564x/44/60/69/4460690b314783fe1f0138027a871a0f.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-    </div>
-
-    <div class="card" style="width: 15rem; flex: 0 0 auto; scroll-snap-align: start;" onclick="selectCard(this)">
-      <img src="https://i.pinimg.com/564x/44/60/69/4460690b314783fe1f0138027a871a0f.jpg" class="card-img-top" alt="...">
-      <div class="card-body">
-        <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      </div>
-    </div>
   </div>
 
   <div style="display: flex; justify-content: center; align-items: center;">
@@ -318,6 +249,45 @@ function generateCalendar() {
       card.classList.add('selected');
     }
 
+    document.addEventListener('DOMContentLoaded', async () => {
+        const container = document.querySelector('#cards-container');
+
+        async function carregarServicos() {
+            try {
+                // Faz a requisição para a API
+                const response = await fetch('http://localhost:3000/servicos');
+                const servicos = await response.json();
+
+                // Limpa os cards antes de adicionar novos
+                container.innerHTML = '';
+
+                // Cria os cards para cada serviço
+                servicos.forEach(servico => {
+                    const card = `
+                        <div  class="card custom-card" style="width: 24rem; margin: 10px;">
+                            <img src="https://static.wixstatic.com/media/aff363_e32659d7e77a450cb9dc3b27cc62c4fb~mv2.png/v1/fill/w_446,h_511,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/aff363_e32659d7e77a450cb9dc3b27cc62c4fb~mv2.png" class="card-img-top" alt="${servico.nome}">
+                            <div class="card-body">
+                                <h5 class="card-title">${servico.nome}</h5>
+                                <p style="text-align: justify" class="card-text">${servico.descricao}</p>
+                                <p class="card-text"><strong>Preço:</strong> R$ ${servico.preco}</p>
+                            </div>
+                        </div>
+                    `;
+                    container.innerHTML += card; // Adiciona o card ao container
+                });
+                const cards = container.querySelectorAll('.custom-card');
+                cards.forEach(card => {
+                    card.addEventListener('click', () => selectCard(card));
+                });
+            } catch (error) {
+                console.error('Erro ao carregar os serviços:', error);
+                alert('Erro ao carregar os serviços!');
+            }
+        }
+
+        // Chama a função ao carregar a página
+        carregarServicos();
+    });
   </script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
