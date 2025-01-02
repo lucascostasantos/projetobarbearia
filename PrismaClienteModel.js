@@ -40,6 +40,7 @@ class ClienteModel {
   }
 
   async update(cliente) {
+    console.log(cliente);
     const clientes = await prisma.clientes.update({
       where: {
         id: Number(cliente.id)

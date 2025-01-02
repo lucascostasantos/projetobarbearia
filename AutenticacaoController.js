@@ -1,70 +1,73 @@
 import ClienteModel from "./PrismaClienteModel.js";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import AgendamentoModel from "./PrismaAgendamentoModel.js";
 
-const JWT_SECRET = "deadpooljesusdamarvel"; // Altere para algo mais seguro!
+
 
 class AutenticacaoController {
-  // Página de login
+
   async index(req, res) {
-    res.sendFile("index.html", { root: process.cwd() });
+    res.render("telainicial");
   }
 
-  // Página de erro
-  async erro(req, res) {
-    res.sendFile("erro.html", { root: process.cwd() });
-  }
-
-  // Página inicial (protegida)
   async home(req, res) {
-    res.sendFile("telainicial.html", { root: process.cwd() });
+    // Verifica se o usuário está logado
+    if (!req.session.logado) {
+        return res.redirect('/login');
+    }
+
+    // Garante que a sessão do usuário exista
+    const usuario = req.session.usuario || {};
+    const agendamentos = usuario.agendamentos || []; // Se não houver agendamentos, define como array vazio
+
+    console.log(agendamentos); // Depuração para verificar os dados
+
+    // Renderiza a tela inicial com os agendamentos
+    res.render("telainicial", { agendamentos: agendamentos });
   }
 
-  // Login com JWT
+
   async login(req, res) {
     const { email, senha } = req.body;
 
-    // 1. Verificar se o usuário existe
-    const cliente = await ClienteModel.findByEmail(email);
-    if (!cliente) {
-      return res.status(401).json({ error: "Usuário ou senha inválidos!" });
-    }
-
-    // 2. Verificar a senha criptografada
-    const senhaValida = await bcrypt.compare(senha, usuario.senha);
-    if (!senhaValida) {
-      return res.status(401).json({ error: "Usuário ou senha inválidos!" });
-    }
-
-    // 3. Gerar o token JWT
-    const token = jwt.sign(
-      { id: cliente.id, email: usuario.email },
-      JWT_SECRET,
-      { expiresIn: "1h" } // Token válido por 1 hora
-    );
-
-    // 4. Retornar o token para o cliente
-    res.json({ token });
-  }
-
-  // Middleware para proteger rotas
-  verificarToken(req, res, next) {
-    const token = req.headers.authorization?.split(" ")[1]; // Bearer TOKEN
-    if (!token) return res.status(401).json({ error: "Acesso negado!" });
-
     try {
-      const decoded = jwt.verify(token, JWT_SECRET);
-      req.user = decoded; // Armazena dados do usuário no req
-      next();
-    } catch (err) {
-      res.status(401).json({ error: "Token inválido!" });
-    }
-  }
+        // Busca o cliente pelo email
+        const cliente = await ClienteModel.findByEmail(email);
 
-  // Página protegida
-  async perfil(req, res) {
-    res.json({ message: `Bem-vindo, ${req.user.email}!` });
-  }
+        if (!cliente) {
+            // Retorna status 401 (não autorizado) e uma mensagem
+            return res.status(401).json({ erro: 'Email ou senha incorretos!' });
+        }
+
+        // Verificação direta da senha (não recomendada em produção)
+        if (senha !== cliente.senha) {
+            return res.status(401).json({ erro: 'Email ou senha incorretos!' });
+        }
+
+        // Busca os agendamentos do cliente
+        const agendamentos = await AgendamentoModel.find({
+            where: { clienteId: cliente.id }
+        });
+
+        // Armazena os dados na sessão
+        req.session.usuario = {
+            id: cliente.id,
+            nome: cliente.nome,
+            email: cliente.email,
+            telefone: cliente.telefone,
+            senha: cliente.senha,
+            agendamentos: agendamentos
+        };
+
+        req.session.logado = true;
+
+        // Resposta bem-sucedida
+        res.status(200).json({ sucesso: true });
+    } catch (error) {
+        console.error('Erro no login:', error);
+        res.status(500).json({ erro: 'Erro interno no servidor!' });
+    }
+}
+
 }
 
 export default new AutenticacaoController();

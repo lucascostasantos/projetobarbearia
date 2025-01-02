@@ -19,7 +19,7 @@ class AgendamentoModel {
   }
 
   async create(agendamento) {
-    const agendamento = await prisma.agendamento.create({
+    const novoagendamento = await prisma.agendamento.create({
       data: {
         nome: cliente.nome,
         email: cliente.email,
@@ -27,7 +27,7 @@ class AgendamentoModel {
         telefone: cliente.telefone
       }
     })
-    return clientes;
+    return novoagendamento;
   }
 
   async update(cliente) {
@@ -55,4 +55,4 @@ class AgendamentoModel {
   }
 }
 
-export default new ClienteModel();
+export default new AgendamentoModel();
