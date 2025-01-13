@@ -24,7 +24,8 @@ CREATE TABLE "Agendamento" (
     "id" SERIAL NOT NULL,
     "clienteId" INTEGER NOT NULL,
     "servicoId" INTEGER NOT NULL,
-    "horarioId" INTEGER NOT NULL,
+    "data" TIMESTAMP(3) NOT NULL,
+    "horario" TIMESTAMP(3) NOT NULL,
     "status" TEXT NOT NULL DEFAULT 'agendado',
     "criadoEm" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "atualizadoEm" TIMESTAMP(3) NOT NULL,
@@ -52,6 +53,3 @@ ALTER TABLE "Agendamento" ADD CONSTRAINT "Agendamento_clienteId_fkey" FOREIGN KE
 
 -- AddForeignKey
 ALTER TABLE "Agendamento" ADD CONSTRAINT "Agendamento_servicoId_fkey" FOREIGN KEY ("servicoId") REFERENCES "Servicos"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "Agendamento" ADD CONSTRAINT "Agendamento_horarioId_fkey" FOREIGN KEY ("horarioId") REFERENCES "HorarioDisponivel"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

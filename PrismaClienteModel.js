@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient()
 
@@ -28,19 +29,52 @@ class ClienteModel {
   }
 
   async create(cliente) {
-    const clientes = await prisma.clientes.create({
-      data: {
-        nome: cliente.nome,
-        email: cliente.email,
-        senha: cliente.senha,
-        telefone: cliente.telefone
+      try {
+          // Validação básica
+          if (!cliente.nome || !cliente.email || !cliente.senha || !cliente.telefone) {
+              throw new Error('Todos os campos são obrigatórios.');
+          }
+
+          // Valida o formato do e-mail
+          const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+          if (!emailValido.test(cliente.email)) {
+              throw new Error('E-mail inválido.');
+          }
+
+          // Verifica se o e-mail já está cadastrado
+          const emailExistente = await prisma.clientes.findUnique({
+              where: {
+                  email: cliente.email
+              }
+          });
+
+          if (emailExistente) {
+              throw new Error('E-mail já cadastrado. Por favor, use outro e-mail.');
+          }
+
+          // Criptografa a senha antes de salvar
+          const senhaHash = await bcrypt.hash(cliente.senha, 10);
+
+          // Cria o cliente no banco de dados
+          const novoCliente = await prisma.clientes.create({
+              data: {
+                  nome: cliente.nome,
+                  email: cliente.email,
+                  senha: senhaHash,
+                  telefone: cliente.telefone
+              }
+          });
+
+          return novoCliente; // Retorna os dados criados
+
+      } catch (error) {
+          throw new Error(error.message); // Repassa o erro para tratamento no front-end
       }
-    })
-    return clientes;
   }
 
+
+
   async update(cliente) {
-    console.log(cliente);
     const clientes = await prisma.clientes.update({
       where: {
         id: Number(cliente.id)

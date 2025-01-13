@@ -102,19 +102,25 @@
   }
 
 
+
   </style>
 </head>
 <body>
   <div class="container mt-4" style="margin-bottom: 40px;">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-      <button class="btn btn-outline-secondary" id="prev-day"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-left-circle" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
-      </svg></button>
-      <h5>Selecione uma Data e Horário</h5>
-      <button class="btn btn-outline-secondary" id="next-day"><svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
-        <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"/>
-      </svg></button>
+    <div class="d-flex justify-content-between align-items-center mb-3" id="calendar-nav">
+        <button class="btn btn-outline-secondary" id="prev-day">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-left-circle" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0m-4.5-.5a.5.5 0 0 1 0 1H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5z"/>
+            </svg>
+        </button>
+        <h5 id="centered-text">Selecione uma Data</h5>
+        <button class="btn btn-outline-secondary" id="next-day">
+            <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-arrow-right-circle" viewBox="0 0 16 16">
+                <path fill-rule="evenodd" d="M1 8a7 7 0 1 0 14 0A7 7 0 0 0 1 8m15 0A8 8 0 1 1 0 8a8 8 0 0 1 16 0M4.5 7.5a.5.5 0 0 0 0 1h5.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3a.5.5 0 0 0 0-.708l-3-3a.5.5 0 1 0-.708.708L10.293 7.5z"/>
+            </svg>
+        </button>
     </div>
+
 
     <div class="calendar-container d-flex flex-wrap justify-content-center" id="calendar-row">
       <!-- As datas serão inseridas dinamicamente aqui -->
@@ -123,7 +129,7 @@
 
     <!-- Área de Horários -->
     <div id="time-slots" class="mt-4 hidden text-center">
-      <h5>Escolha um horário</h5>
+      <h5>Escolha um horário disponível</h5>
       <div class="d-flex flex-wrap justify-content-center" id="time-slot-container">
         <!-- Os horários serão inseridos dinamicamente aqui -->
       </div>
@@ -151,91 +157,139 @@
     const nextDayButton = document.getElementById('next-day');
   
     let startDate = new Date(); // Garante que seja sempre a data atual
-startDate.setHours(0, 0, 0, 0); // Remove horas, minutos e segundos para evitar inconsistências
-const daysToShow = 7;
-let selectedDate = null;
+    startDate.setHours(0, 0, 0, 0); // Remove horas, minutos e segundos para evitar inconsistências
+    const daysToShow = 7;
+    let selectedDate = null;
 
-// Função para gerar as datas no calendário
-function generateCalendar() {
-  calendarRow.innerHTML = ''; // Limpa o calendário
-  for (let i = 0; i < daysToShow; i++) {
-    const currentDate = new Date(startDate);
-    currentDate.setDate(startDate.getDate() + i);
+    // Função para gerar as datas no calendário
+    // Função para gerar as datas no calendário
+    function generateCalendar() {
+      calendarRow.innerHTML = ''; // Limpa o calendário
+      for (let i = 0; i < daysToShow; i++) {
+        const currentDate = new Date(startDate);
+        currentDate.setDate(startDate.getDate() + i);
 
-    const dateBox = document.createElement('div');
-    dateBox.className = 'date-box';
-    dateBox.innerText = currentDate.toLocaleDateString('pt-BR', { 
-      weekday: 'short', 
-      day: 'numeric', 
-      month: 'short' 
-    });
-    dateBox.setAttribute('data-date', currentDate.toISOString().split('T')[0]); // Armazena a data no formato ISO
+        const dateBox = document.createElement('div');
+        dateBox.className = 'date-box';
+        dateBox.innerText = currentDate.toLocaleDateString('pt-BR', { 
+          weekday: 'short', 
+          day: 'numeric', 
+          month: 'short' 
+        });
+        dateBox.setAttribute('data-date', currentDate.toISOString().split('T')[0]); // Armazena a data no formato ISO
 
-    // Adiciona evento de clique
-    dateBox.onclick = () => selectDate(dateBox);
+        // Adiciona evento de clique
+        dateBox.onclick = () => selectDate(dateBox);
 
-    calendarRow.appendChild(dateBox);
-  }
-}
-  
+        calendarRow.appendChild(dateBox);
+      }
+    }
+
     // Função para selecionar uma data
     function selectDate(element) {
       // Remove a seleção de outras datas
       document.querySelectorAll('.date-box').forEach((box) => box.classList.remove('selected'));
+      
+      // Marca a data clicada como selecionada
       element.classList.add('selected');
       
-      selectedDate = element.getAttribute('data-date'); // Armazena a data selecionada
-      showTimeSlots(); // Mostra os horários disponíveis
+      // Armazena a data selecionada
+      selectedDate = element.getAttribute('data-date');
+      
+      // Atualiza os horários disponíveis para a data selecionada
+      showTimeSlots();
     }
 
-    generateCalendar();
-  
-    // Função para exibir os horários disponíveis para a data selecionada
-    // Função para exibir os horários disponíveis para a data selecionada
-    function showTimeSlots() {
-      timeSlotsDiv.classList.remove('hidden'); // Exibe a seção de horários
-      timeSlotContainer.innerHTML = ''; // Limpa os horários anteriores
+    generateCalendar()
 
-      const startHour = 8;
-      const endHour = 19;
+    async function showTimeSlots() {
+    timeSlotsDiv.classList.remove('hidden'); // Mostra o container de horários
+    timeSlotContainer.innerHTML = ''; // Limpa os horários anteriores
 
-      for (let i = startHour; i <= endHour; i++) {
-        // Pular horários específicos (exemplo: pular 11:00 e 15:00)
-        if (i === 11 || i === 12 || i === 13) {
-          continue; // Pula o horário atual
-        }
+    // Busca os horários disponíveis para a data selecionada
+    const unavailableSlots = await fetchAvailableTimeSlots(selectedDate); // Armazena a resposta na variável 'unavailableSlots'
 
+    // Exibe os horários indisponíveis diretamente
+    unavailableSlots.forEach((slot) => {
         const timeSlot = document.createElement('div');
         timeSlot.className = 'time-slot';
-        timeSlot.innerText = `${i}:00`;
-        timeSlot.setAttribute('data-time', `${i}:00`);
+        timeSlot.innerText = slot.horario;  // Aqui usamos o formato correto de 'horario' retornado da API
+        timeSlot.setAttribute('data-time', slot.horario);
 
+        // Evento de clique para selecionar o horário
         timeSlot.onclick = () => selectTime(timeSlot);
 
-        timeSlotContainer.appendChild(timeSlot);
+        timeSlotContainer.appendChild(timeSlot); // Adiciona o horário ao container
+    });
+}
+
+
+
+    async function fetchAvailableTimeSlots(date) {
+      try {
+          const response = await fetch(`/horarios-indisponiveis?data=${date}`); // Certifique-se de que a rota está correta
+          if (!response.ok) {
+              throw new Error('Erro ao buscar horários disponíveis');
+          }
+          return await response.json(); // Retorna os horários disponíveis no formato esperado
+      } catch (error) {
+          console.error('Erro ao carregar horários disponíveis:', error);
+          alert('Não foi possível carregar os horários. Tente novamente mais tarde.');
+          return [];
       }
     }
 
-  
-    // Função para selecionar um horário
+
+    
     function selectTime(element) {
-      // Remove a seleção de outros horários
       document.querySelectorAll('.time-slot').forEach((slot) => slot.classList.remove('selected'));
       element.classList.add('selected');
-      
     }
+
   
-    // Função para navegar para o dia anterior
-    prevDayButton.onclick = () => {
-      startDate.setDate(startDate.getDate() - 1);
-      generateCalendar();
-    };
+    // Função para verificar e esconder o botão de navegação para o dia anterior
+function updatePrevButtonVisibility() {
+  const currentDate = new Date(); // Data atual no fuso horário local
+  const currentStartDate = new Date(startDate); // Copia a data de início
   
-    // Função para navegar para o próximo dia
-    nextDayButton.onclick = () => {
-      startDate.setDate(startDate.getDate() + 1);
-      generateCalendar();
-    };
+  // Se a data selecionada for igual à data atual, esconde o botão "Anterior"
+  if (currentStartDate.toDateString() === currentDate.toDateString()) {
+    prevDayButton.style.display = 'none'; // Esconde o botão
+  } else {
+    prevDayButton.style.display = 'inline-block'; // Exibe o botão
+  }
+}
+
+// Função para navegar para o dia anterior
+prevDayButton.onclick = () => {
+  const currentDate = new Date(); // Data atual no fuso horário local
+  const previousDay = new Date(startDate); // Copia a data de início
+  
+  // Subtrai um dia da data atual
+  previousDay.setDate(previousDay.getDate() - 1);
+
+  // Verifica se o dia anterior é antes da data atual
+  if (previousDay < currentDate) {
+    // Se for antes da data atual, define a data para a data atual
+    startDate.setDate(currentDate.getDate());
+  } else {
+    // Caso contrário, apenas subtrai um dia
+    startDate.setDate(startDate.getDate() - 1);
+  }
+
+  generateCalendar(); // Atualiza o calendário
+  updatePrevButtonVisibility(); // Atualiza a visibilidade do botão "Anterior"
+};
+
+// Função para navegar para o próximo dia
+nextDayButton.onclick = () => {
+  startDate.setDate(startDate.getDate() + 1);
+  generateCalendar(); // Atualiza o calendário
+  updatePrevButtonVisibility(); // Atualiza a visibilidade do botão "Anterior"
+};
+
+// Chama a função na inicialização para garantir que o botão "Anterior" seja configurado corretamente
+updatePrevButtonVisibility();
   
 
     function selectCard(card) {
@@ -250,45 +304,108 @@ function generateCalendar() {
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-        const container = document.querySelector('#cards-container');
+    const container = document.querySelector('#cards-container');
+    let selectedServiceId = null; // Variável para armazenar o ID do serviço selecionado
 
-        async function carregarServicos() {
-            try {
-                // Faz a requisição para a API
-                const response = await fetch('http://localhost:3000/servicos');
-                const servicos = await response.json();
+    // Função para carregar serviços
+    async function carregarServicos() {
+        try {
+            // Faz a requisição para a API
+            const response = await fetch('http://localhost:3000/servicos');
+            const servicos = await response.json();
 
-                // Limpa os cards antes de adicionar novos
-                container.innerHTML = '';
+            // Limpa os cards antes de adicionar novos
+            container.innerHTML = '';
 
-                // Cria os cards para cada serviço
-                servicos.forEach(servico => {
-                    const card = `
-                        <div  class="card custom-card" style="width: 24rem; margin: 10px;">
-                            <img src="https://static.wixstatic.com/media/aff363_e32659d7e77a450cb9dc3b27cc62c4fb~mv2.png/v1/fill/w_446,h_511,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/aff363_e32659d7e77a450cb9dc3b27cc62c4fb~mv2.png" class="card-img-top" alt="${servico.nome}">
-                            <div class="card-body">
-                                <h5 class="card-title">${servico.nome}</h5>
-                                <p style="text-align: justify" class="card-text">${servico.descricao}</p>
-                                <p class="card-text"><strong>Preço:</strong> R$ ${servico.preco}</p>
-                            </div>
+            // Cria os cards para cada serviço
+            servicos.forEach(servico => {
+                const card = `
+                    <div class="card custom-card" style="width: 24rem; margin: 10px;" data-id="${servico.id}">
+                        <img src="https://static.wixstatic.com/media/aff363_e32659d7e77a450cb9dc3b27cc62c4fb~mv2.png/v1/fill/w_446,h_511,al_c,q_85,usm_0.66_1.00_0.01,enc_auto/aff363_e32659d7e77a450cb9dc3b27cc62c4fb~mv2.png" 
+                            class="card-img-top" alt="${servico.nome}">
+                        <div class="card-body">
+                            <h5 class="card-title">${servico.nome}</h5>
+                            <p style="text-align: justify" class="card-text">${servico.descricao}</p>
+                            <p class="card-text"><strong>Preço:</strong> R$ ${servico.preco}</p>
                         </div>
-                    `;
-                    container.innerHTML += card; // Adiciona o card ao container
-                });
-                const cards = container.querySelectorAll('.custom-card');
-                cards.forEach(card => {
-                    card.addEventListener('click', () => selectCard(card));
-                });
-            } catch (error) {
-                console.error('Erro ao carregar os serviços:', error);
-                alert('Erro ao carregar os serviços!');
-            }
-        }
+                    </div>
+                `;
+                container.innerHTML += card; // Adiciona o card ao container
+            });
 
-        // Chama a função ao carregar a página
-        carregarServicos();
+            // Adiciona evento de clique nos cards
+            const cards = container.querySelectorAll('.custom-card');
+            cards.forEach(card => {
+                card.addEventListener('click', () => selectCard(card));
+            });
+
+        } catch (error) {
+            console.error('Erro ao carregar os serviços:', error);
+            alert('Erro ao carregar os serviços!');
+        }
+    }
+
+    // Função para selecionar o card
+    function selectCard(card) {
+        const cards = document.querySelectorAll('.custom-card');
+        cards.forEach(c => c.classList.remove('selected')); // Remove a seleção de todos os cards
+        card.classList.add('selected'); // Adiciona a classe de selecionado ao card clicado
+
+        // Armazena o ID do serviço selecionado
+        selectedServiceId = parseInt(card.getAttribute('data-id'), 10);
+    }
+
+    // Chama a função para carregar os serviços ao carregar a página
+    carregarServicos();
+
+    // Evento do botão Enviar
+    document.querySelector('button[type="button"]').addEventListener('click', async () => {
+      // Ajustar o horário para o UTC antes de enviar
+      const selectedDate = document.querySelector('.date-box.selected')?.getAttribute('data-date');
+      const selectedTime = document.querySelector('.time-slot.selected')?.getAttribute('data-time');
+
+      if (!selectedDate || !selectedTime || !selectedServiceId) {
+          alert('Selecione uma data, horário e serviço antes de continuar.');
+          return;
+      }
+
+      // Combina a data e o horário selecionados
+      const localDateTime = new Date(`${selectedDate}T${selectedTime}:00`);
+
+      // Converte para UTC
+      const utcDateTime = new Date(localDateTime.getTime() - localDateTime.getTimezoneOffset() * 60000);
+
+      // Prepara o objeto para o backend
+      const agendamento = {
+          data: utcDateTime.toISOString(), // Envia a data em UTC no formato ISO 8601
+          horario: utcDateTime.toISOString(), // O mesmo para o horário
+          servicoId: selectedServiceId // Envia o ID do serviço selecionado
+      };
+
+      try {
+          const response = await fetch('http://localhost:3000/agendamentos', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(agendamento)
+          });
+
+          if (response.ok) {
+              // Salva no localStorage que o agendamento foi realizado com sucesso
+              localStorage.setItem('agendamentoSucesso', 'true');
+              window.location.href = '/telainicial'; // Redireciona para a tela inicial
+          } else {
+              alert('Erro ao realizar agendamento. Tente novamente!');
+          }
+      } catch (error) {
+          console.error('Erro:', error);
+          alert('Erro na conexão com o servidor.');
+      }
     });
-  </script>
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+});
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>

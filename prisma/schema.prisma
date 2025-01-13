@@ -23,6 +23,7 @@ model Clientes {
   agendamentos Agendamento[]
 }
 
+
 model Servicos {
   id          Int         @id @default(autoincrement())
   nome        String
@@ -35,7 +36,8 @@ model Agendamento {
   id            Int         @id @default(autoincrement())
   clienteId     Int
   servicoId     Int
-  horarioId     Int
+  data          DateTime    // Data do agendamento
+  horario       DateTime    // Horário do agendamento
   status        String      @default("agendado")
   criadoEm      DateTime    @default(now())
   atualizadoEm  DateTime    @updatedAt
@@ -43,13 +45,13 @@ model Agendamento {
   // Relacionamentos
   cliente       Clientes     @relation(fields: [clienteId], references: [id])
   servico       Servicos     @relation(fields: [servicoId], references: [id])
-  horario       HorarioDisponivel @relation(fields: [horarioId], references: [id])
 }
 
-// Tabela de Horários Disponíveis
+
+
+
 model HorarioDisponivel {
   id            Int         @id @default(autoincrement())
   dataHora      DateTime    @unique
   disponivel    Boolean     @default(true)
-  agendamentos  Agendamento[]
 }

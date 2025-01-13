@@ -26,6 +26,7 @@ class ClienteController {
   }
 
   async update(req, res) {
+    const id = parseInt(req.params.id);
     const nome = req.body.nome;
     const email = req.body.email;
     const telefone = req.body.telefone;

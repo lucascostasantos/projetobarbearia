@@ -20,6 +20,15 @@
             background-color: #ffffff;
             margin: 20px auto;
         }
+        .status-agendado {
+            color: rgb(26, 241, 26) !important; /* Força a aplicação da cor */
+            font-weight: bold;
+        }
+
+        .status-cancelado {
+            color: rgb(235, 37, 37) !important; /* Força a aplicação da cor */
+            font-weight: bold;
+        }
     </style>
 </head>
 <body style="background-color: black;">
@@ -34,19 +43,246 @@
     <h1 style="margin-left: 135px; color:white">Meus Agendamentos</h1>
     <hr>
     <div id="agendamentos-lista" style="width: 80%; margin: auto;">
-        {{#if agendamentos.length}}
-            <table class="table">
-                {{#each agendamentos}}
-                    <tr>
-                        <td>{{this.data}}</td>
-                        <td>{{this.horario}}</td>
-                    </tr>
-                {{/each}}
-            </table>
-        {{else}}
-            <p style="color:white; text-align:center;">Sem Agendamentos</p>
-        {{/if}}
+        <table class="table table-dark table-striped" id="agendamentosTable">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Serviço</th>
+                    <th>Data</th>
+                    <th>Horário</th>
+                    <th>Status</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody id="agendamentosBody">
+                <!-- Os agendamentos serão inseridos aqui dinamicamente -->
+            </tbody>
+        </table>
+        <p id="semAgendamento" style="color:white; text-align:center; display: none;">Sem Agendamentos</p>
     </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="successToast" class="toast align-items-center text-bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex">
+                <div class="toast-body">
+                    Agendamento realizado com sucesso
+                </div>
+                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação -->
+    <div class="modal fade" id="confirmModal" tabindex="-1" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+        <div class="modal-header">
+            <h5 class="modal-title" id="confirmModalLabel">Cancelar Agendamento</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+        </div>
+        <div class="modal-body">
+            Tem certeza que deseja cancelar este agendamento?
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Não</button>
+            <button type="button" id="confirmCancelBtn" class="btn btn-danger">Sim, Cancelar</button>
+        </div>
+        </div>
+    </div>
+    </div>
+
+
+    <script>
+        // Função para formatar data no padrão brasileiro
+        function formatarData(data) {
+            // Converter a data para o formato 'dd/mm/aaaa'
+            const partes = data.split("T")[0].split("-"); // Divide a data no formato YYYY-MM-DD
+            return `${partes[2]}/${partes[1]}/${partes[0]}`; // Formato: dd/mm/aaaa
+        }
+
+        // Função para formatar horário sem alterar o valor
+        function formatarHorario(dataHora) {
+            const partes = dataHora.split("T"); // Divide a data e hora no formato 'YYYY-MM-DDTHH:mm:ss'
+            const horario = partes[1].split(":"); // Extrai a hora e os minutos
+            return `${horario[0]}:${horario[1]}`; // Formato: hh:mm
+        }
+
+        // Função para buscar nome do serviço
+        function buscarNomeServico(servicoId) {
+            return fetch(`/servicos/${servicoId}`)  // Supondo que exista esse endpoint
+                .then(response => response.json())
+                .then(servico => servico.nome)  // Retorna o nome do serviço
+                .catch(error => {
+                    console.error('Erro ao buscar nome do serviço:', error);
+                    return 'Serviço não encontrado'; // Retorna um nome padrão caso haja erro
+                });
+        }
+
+        fetch('/meus-agendamentos') // Endpoint para buscar os agendamentos
+            .then(response => response.json())
+            .then(agendamentos => {
+                const tabela = document.getElementById('agendamentosBody');
+                const semAgendamentoMessage = document.getElementById('semAgendamento');
+
+                // Se não houver agendamentos, exibe mensagem
+                if (agendamentos.length === 0) {
+                    semAgendamentoMessage.style.display = 'block';
+                } else {
+                    semAgendamentoMessage.style.display = 'none';
+
+                    // Ordena os agendamentos por data e horário (ou outro critério)
+                    agendamentos.sort((a, b) => {
+                        const dataA = new Date(a.data + ' ' + a.horario);
+                        const dataB = new Date(b.data + ' ' + b.horario);
+                        return dataA - dataB; // Crescente (mais antigo para mais novo)
+                    });
+
+                    // Limpa a tabela antes de preencher (para evitar duplicações ao recarregar)
+                    tabela.innerHTML = '';
+
+                    // Cria uma lista de promessas para buscar os nomes dos serviços
+                    const promessasServicos = agendamentos.map(agendamento =>
+                        buscarNomeServico(agendamento.servicoId).then(nomeServico => {
+                            agendamento.nomeServico = nomeServico; // Adiciona o nome do serviço ao objeto do agendamento
+                            return agendamento;
+                        })
+                    );
+
+                    // Espera todas as promessas serem resolvidas antes de renderizar
+                    Promise.all(promessasServicos)
+                        .then(agendamentosComServicos => {
+                            agendamentosComServicos.forEach((agendamento, index) => {
+                                // Formata a data e o horário antes de exibir
+                                const dataFormatada = formatarData(agendamento.data);
+                                const horarioFormatado = formatarHorario(agendamento.horario);
+
+                                // Cria uma nova linha na tabela
+                                const row = document.createElement('tr');
+                                row.id = `agendamento-${agendamento.id}`; // Usa o ID único do agendamento
+                                row.innerHTML = `
+                                    <td>${index + 1}</td> <!-- Índice fixo baseado na ordem original -->
+                                    <td>${agendamento.nomeServico}</td> <!-- Exibe o nome do serviço -->
+                                    <td>${dataFormatada}</td> <!-- Exibe a data formatada -->
+                                    <td>${horarioFormatado}</td> <!-- Exibe o horário formatado -->
+                                    <td class="status ${agendamento.status === 'cancelado' ? 'status-cancelado' : 'status-agendado'}">
+                                        ${agendamento.status.charAt(0).toUpperCase() + agendamento.status.slice(1)}
+                                    </td>
+                                    ${
+                                        agendamento.status !== 'cancelado'
+                                            ? `
+                                                <td>
+                                                    <button type="button" 
+                                                            style="height: 30px; font-size: 12px; font-weight: bold; background-color: rgba(52, 79, 252, 1); color:white" 
+                                                            class="btn btn">REAGENDAR</button>
+                                                </td>
+                                                <td>
+                                                    <button onclick="confirmarcancelaragendamento(${agendamento.id})" 
+                                                            type="button" 
+                                                            style="height: 30px; font-size: 12px; font-weight: bold; background-color: red; color:white" 
+                                                            class="btn btn">CANCELAR</button>
+                                                </td>
+                                            `
+                                            : `<td></td><td></td>` // Caso esteja cancelado, exibe células vazias
+                                    }
+                                `;
+                                tabela.appendChild(row);
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Erro ao carregar nomes dos serviços:', error);
+                        });
+                }
+            })
+            .catch(error => {
+                console.error('Erro ao carregar agendamentos:', error);
+            });
+
+
+            let agendamentoId; // Variável global para armazenar o ID do agendamento
+            function confirmarcancelaragendamento(id) {
+                agendamentoId = id; // Armazena o ID do agendamento selecionado
+                const modal = new bootstrap.Modal(document.getElementById('confirmModal')); // Inicializa o modal
+                modal.show(); // Exibe o modal
+            }
+
+            // Evento para confirmar o cancelamento
+            document.getElementById('confirmCancelBtn').addEventListener('click', () => {
+                if (agendamentoId) {
+                    cancelarAgendamento(agendamentoId)
+                        .then(() => {
+                            location.reload(); // Recarrega a página após cancelar
+                        })
+                        .catch(error => {
+                            console.error('Erro ao cancelar agendamento:', error);
+                        });
+                }
+            });
+
+            // Função para cancelar o agendamento
+            function cancelarAgendamento(id) {
+                return fetch(`/agendamentos/${id}`, {
+                    method: 'PUT', // Método para atualização
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ status: 'cancelado' }), // Passa o novo status para a API
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erro ao cancelar agendamento.');
+                        }
+                        return response.json(); // Retorna o agendamento atualizado
+                    })
+                    .then(agendamento => {
+                        if (agendamento.status === 'cancelado') {
+                            atualizarStatus(agendamento.id, agendamento.status); // Atualiza a UI dinamicamente
+                        }
+                    });
+            }
+
+            // Função para atualizar o status na tabela
+            function atualizarStatus(agendamentoId, status) {
+                const row = document.getElementById(`agendamento-${agendamentoId}`);
+                if (!row) return; // Verifica se a linha existe
+
+                const statusElement = row.querySelector('.status');
+                if (!statusElement) return; // Verifica se o elemento de status existe
+
+                // Atualiza o texto do status
+                statusElement.innerText = status.charAt(0).toUpperCase() + status.slice(1);
+
+                // Remove as classes existentes de status
+                statusElement.classList.remove('status-agendado', 'status-cancelado');
+
+                // Adiciona a classe com base no novo status
+                if (status === 'agendado') {
+                    statusElement.classList.add('status-agendado');
+                } else if (status === 'cancelado') {
+                    statusElement.classList.add('status-cancelado');
+                }
+
+                // Remove botões se o status for cancelado
+                if (status === 'cancelado') {
+                    row.querySelectorAll('td:nth-child(6), td:nth-child(7)').forEach(td => {
+                        td.innerHTML = ''; // Limpa as células
+                    });
+                }
+            }
+
+
+            window.addEventListener('DOMContentLoaded', () => {
+                // Verifica se o agendamento foi bem-sucedido
+                if (localStorage.getItem('agendamentoSucesso') === 'true') {
+                    // Exibe o toast
+                    const toast = new bootstrap.Toast(document.getElementById('successToast'));
+                    toast.show();
+
+                    // Limpa o item após exibir a mensagem
+                    localStorage.removeItem('agendamentoSucesso');
+                }
+            });
+    </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 </body>

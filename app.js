@@ -13,7 +13,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 app.use(cors({
-    origin: 'http://localhost:5500', // Altere para a porta onde está rodando o front-end
+    origin: 'http://localhost:3000', // Altere para a porta onde está rodando o front-end
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));

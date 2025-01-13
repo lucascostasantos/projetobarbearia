@@ -1,5 +1,6 @@
 import ClienteModel from "./PrismaClienteModel.js";
 import AgendamentoModel from "./PrismaAgendamentoModel.js";
+import bcrypt from 'bcryptjs';
 
 
 
@@ -19,8 +20,6 @@ class AutenticacaoController {
     const usuario = req.session.usuario || {};
     const agendamentos = usuario.agendamentos || []; // Se não houver agendamentos, define como array vazio
 
-    console.log(agendamentos); // Depuração para verificar os dados
-
     // Renderiza a tela inicial com os agendamentos
     res.render("telainicial", { agendamentos: agendamentos });
   }
@@ -38,8 +37,10 @@ class AutenticacaoController {
             return res.status(401).json({ erro: 'Email ou senha incorretos!' });
         }
 
-        // Verificação direta da senha (não recomendada em produção)
-        if (senha !== cliente.senha) {
+        // Compara a senha informada com a senha criptografada
+        const senhaValida = await bcrypt.compare(senha, cliente.senha); // <- Aqui está a comparação correta!
+
+        if (!senhaValida) {
             return res.status(401).json({ erro: 'Email ou senha incorretos!' });
         }
 
@@ -54,7 +55,6 @@ class AutenticacaoController {
             nome: cliente.nome,
             email: cliente.email,
             telefone: cliente.telefone,
-            senha: cliente.senha,
             agendamentos: agendamentos
         };
 
